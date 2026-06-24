@@ -131,7 +131,7 @@ if selected == "Beranda":
     # Kotak Kelompok Hijau Gelap Identitas Anda
     st.markdown("""
     <div style="background-color: #112E14; padding: 15px; border-radius: 8px; color: #81C784;">
-        <b style="color: #FFFFFF;">KELOMPOK 4</b><br>
+        <b style="color: #FFFFFF;">KELOMPOK 1</b><br>
         • Ali Fajar Maulana (10090222056)
     </div>
     """, unsafe_allow_html=True)
