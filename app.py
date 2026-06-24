@@ -121,10 +121,29 @@ if selected == "Beranda":
     st.title("🌳 Eco-Forest Valuation KPHP Lalan Mangsang Mendis")
     st.write("PBL 6 — Ekonomi Sumber Daya Hutan")
     st.write("---")
+    
+    # 1. INFORMASI AKADEMIK (Dipindah ke atas)
+    st.header("📚 Informasi Akademik")
+    col_info1, col_info2 = st.columns(2)
+    with col_info1:
+        st.write("**Mata Kuliah:**")
+        st.write("Ekonomi Sumber Daya Alam dan Lingkungan")
+    with col_info2:
+        st.write("**Dosen Pengampu:**")
+        st.write("Yuhka Sundaya, S.E., M.Si.")
+    
+    st.write("")
+    # Kotak Kelompok Hijau Gelap Identitas
+    st.markdown("""
+    <div style="background-color: #112E14; padding: 18px; border-radius: 8px; color: #81C784; border-left: 6px solid #2E7D32;">
+        <b style="color: #FFFFFF; font-size: 16px;">KELOMPOK 1</b><br>
+        <span style="color: #FFFFFF;">• Ali Fajar Maulana (10090222056)</span>
+    </div>
+    """, unsafe_allow_html=True)
 
-    # ----------------------------------------------------
-    # TAMBAHAN MATERI PENDAHULUAN (Mulai Baris 124)
-    # ----------------------------------------------------
+    st.write("---")
+
+    # 2. PENDAHULUAN (Sekarang berada di bawah Informasi Akademik)
     st.header("📄 Pendahuluan")
     st.markdown("""
     Kesatuan Pengelolaan Hutan Produksi (KPHP) Lalan Mangsang Mendis merupakan salah satu kawasan 
@@ -139,21 +158,6 @@ if selected == "Beranda":
     seperti kayu, getah jelutung, dan karet, sekaligus memetakan rencana aksi restorasi vegetasi 
     serta uji kelayakan finansial proyek mikro secara terintegrasi dan berkelanjutan.
     """)
-    st.write("---")
-    
-    st.header("Mata Kuliah")
-    st.write("Ekonomi Sumber Daya Alam dan Lingkungan")
-    
-    st.header("Dosen Pengampu")
-    st.write("Yuhka Sundaya, S.E., M.Si.")
-    
-    # Kotak Kelompok Hijau Gelap Identitas Anda
-    st.markdown("""
-    <div style="background-color: #112E14; padding: 15px; border-radius: 8px; color: #81C784;">
-        <b style="color: #FFFFFF;">KELOMPOK 1</b><br>
-        • Ali Fajar Maulana (10090222056)
-    </div>
-    """, unsafe_allow_html=True)
 
 # --- HALAMAN 2: PROFIL HUTAN ---
 elif selected == "Profil Hutan":
