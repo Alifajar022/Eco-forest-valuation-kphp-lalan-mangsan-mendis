@@ -122,7 +122,7 @@ if selected == "Beranda":
     st.write("PBL 6 — Ekonomi Sumber Daya Hutan")
     st.write("---")
     
-    # 1. INFORMASI AKADEMIK (Dipindah ke atas)
+    # 1. INFORMASI AKADEMIK
     st.header("📚 Informasi Akademik")
     col_info1, col_info2 = st.columns(2)
     with col_info1:
@@ -143,7 +143,7 @@ if selected == "Beranda":
 
     st.write("---")
 
-    # 2. PENDAHULUAN (Sekarang berada di bawah Informasi Akademik)
+    # 2. PENDAHULUAN
     st.header("📄 Pendahuluan")
     st.markdown("""
     Kesatuan Pengelolaan Hutan Produksi (KPHP) Lalan Mangsang Mendis merupakan salah satu kawasan 
@@ -158,6 +158,40 @@ if selected == "Beranda":
     seperti kayu, getah jelutung, dan karet, sekaligus memetakan rencana aksi restorasi vegetasi 
     serta uji kelayakan finansial proyek mikro secara terintegrasi dan berkelanjutan.
     """)
+
+    st.write("---")
+
+    # 3. KERANGKA TEORI ACUAN (TEV & TRADE-OFF)
+    st.header("💡 Kerangka Teori: TEV & Trade-off Ekonomi-Ekologi")
+    
+    col_tev, col_trade = st.columns(2)
+    
+    with col_tev:
+        st.subheader("1. Total Economic Value (TEV)")
+        st.markdown("""
+        **Total Economic Value (TEV)** atau Nilai Ekonomi Total merupakan instrumen akademis komprehensif 
+        yang digunakan untuk mengidentifikasi dan menguantifikasi seluruh spektrum manfaat ekonomi 
+        ekosistem hutan, baik manfaat yang ter-capture oleh pasar maupun fungsi ekologis non-pasar.
+        
+        Dalam konteks analisis KPHP Lalan Mangsang Mendis, TEV diklasifikasikan menjadi:
+        * **Direct Use Value (Nilai Manfaat Langsung):** Nilai komoditas fisik yang dipanen langsung dari tapak hutan. Pada model makro ini direpresentasikan oleh volume produksi komoditas Kayu, Getah Jelutung, dan Karet.
+        * **Indirect Use Value (Nilai Manfaat Tidak Langsung):** Nilai dari berjalannya fungsi pendukung ekosistem (*ecosystem services*), seperti kemampuan rawa gambut dalam retensi tata air, pencegah kebakaran hidrologis, serta *carbon sink*.
+        * **Option & Non-Use Value (Nilai Pilihan & Eksistensi):** Nilai dari opsi perlindungan keanekaragaman hayati masa depan serta kepuasan moral atas kelestarian habitat hutan rawa agar dapat diwariskan lintas generasi.
+        """)
+        
+    with col_trade:
+        st.subheader("2. Analisis Trade-off (Pilihan Dilematis)")
+        st.markdown("""
+        ***Trade-off* (Pertukaran Pilihan)** mendefinisikan situasi struktural di mana pemenuhan satu tujuan optimal 
+        berdampak langsung pada penurunan performa parameter lainnya akibat kelangkaan dan keterbatasan alokasi sumber daya.
+        
+        Skenario pemodelan simulasi pada dashboard ini menjembatani benturan kepentingan fungsional antara:
+        * **Ekstraksi Finansial (Sektor Produksi):** Optimalisasi pemanfaatan zonasi blok produksi kayu makro untuk memacu pertumbuhan ekonomi daerah dan kapasitas fiskal unit pengelola tapak, namun membawa konsekuensi biaya pemulihan ekosistem yang tinggi.
+        * **Preservasi Ekologis (Sektor Restorasi):** Fokus intervensi penuh pada program rehabilitasi vegetasi tanaman lokal (seperti Jelutung dan Kenaf) guna mengembalikan fungsi lingkungan, namun membawa batasan regulasi terhadap laju pemanfaatan ekonomi jangka pendek masyarakat.
+        """)
+        
+    # Catatan Kesimpulan Teoretis Interaktif
+    st.info("📌 Kesimpulan Dashboard: Melalui integrasi parameter simulasi dinamis di bilah navigasi kiri, model visualisasi ini dirancang untuk merumuskan titik ekuilibrium (keseimbangan) optimal, meminimalkan dampak negatif trade-off, dan memaksimalkan capaian akumulasi nilai ekonomi total (TEV) hutan berkelanjutan.")
 
 # --- HALAMAN 2: PROFIL HUTAN ---
 elif selected == "Profil Hutan":
