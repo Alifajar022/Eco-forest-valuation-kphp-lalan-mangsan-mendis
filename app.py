@@ -121,6 +121,25 @@ if selected == "Beranda":
     st.title("🌳 Eco-Forest Valuation KPHP Lalan Mangsang Mendis")
     st.write("PBL 6 — Ekonomi Sumber Daya Hutan")
     st.write("---")
+
+    # ----------------------------------------------------
+    # TAMBAHAN MATERI PENDAHULUAN (Mulai Baris 124)
+    # ----------------------------------------------------
+    st.header("📄 Pendahuluan")
+    st.markdown("""
+    Kesatuan Pengelolaan Hutan Produksi (KPHP) Lalan Mangsang Mendis merupakan salah satu kawasan 
+    hutan strategis di Provinsi Sumatera Selatan yang memiliki peran ganda yang sangat krusial, 
+    baik sebagai benteng ekologis (penyerap karbon dan penyeimbang tata air lahan basah/gambut) 
+    maupun sebagai penggerak roda ekonomi daerah melalui pemanfaatan hasil hutan.
+    
+    Namun, seiring berjalan waktu, sebagian kawasan ini menghadapi tantangan degradasi lahan akibat 
+    perubahan fungsi guna tanah dan kebakaran hutan. Oleh karena itu, diperlukan suatu pendekatan 
+    **Penilaian Ekonomi Sumber Daya Hutan (Eco-Forest Valuation)** untuk menghitung potensi nyata kawasan. 
+    Melalui instrumen dashboard ini, kita dapat mensimulasikan nilai ekonomi makro dari komoditas unggulan 
+    seperti kayu, getah jelutung, dan karet, sekaligus memetakan rencana aksi restorasi vegetasi 
+    serta uji kelayakan finansial proyek mikro secara terintegrasi dan berkelanjutan.
+    """)
+    st.write("---")
     
     st.header("Mata Kuliah")
     st.write("Ekonomi Sumber Daya Alam dan Lingkungan")
