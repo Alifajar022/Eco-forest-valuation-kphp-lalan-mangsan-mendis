@@ -151,10 +151,10 @@ if selected == "Beranda":
     baik sebagai benteng ekologis (penyerap karbon dan penyeimbang tata air lahan basah/gambut) 
     maupun sebagai penggerak roda ekonomi daerah melalui pemanfaatan hasil hutan.
     
-    Namun, seiring berjalan waktu, sebagian kawasan ini menghadapi tantangan degradasi lahan akibat 
-    perubahan fungsi guna tanah dan kebakaran hutan. Oleh karena itu, diperlukan suatu pendekatan 
+    Namun, sebagian kawasan ini menghadapi tantangan degradasi lahan akibat 
+    perubahan fungsi guna tanah dan kebakaran hutan. Maka dari itu, diperlukan suatu pendekatan 
     **Penilaian Ekonomi Sumber Daya Hutan (Eco-Forest Valuation)** untuk menghitung potensi nyata kawasan. 
-    Melalui instrumen dashboard ini, kita dapat mensimulasikan nilai ekonomi makro dari komoditas unggulan 
+    Melalui instrumen dashboard ini, saya mensimulasikan nilai ekonomi makro dari komoditas unggulan 
     seperti kayu, getah jelutung, dan karet, sekaligus memetakan rencana aksi restorasi vegetasi 
     serta uji kelayakan finansial proyek mikro secara terintegrasi dan berkelanjutan.
     """)
