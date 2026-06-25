@@ -71,30 +71,58 @@ df_kelayakan = pd.DataFrame(data_kelayakan_proyek)
 with st.sidebar:
     # Menampilkan Logo Unisba paling atas di sidebar
     st.image("logo unisba.jpg", use_container_width=True)
-    st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Eco-Forest Valuation</h3>", unsafe_allow_html=True)
-    
-    # Menu Navigasi Vertikal Bulat-Bulat
+
+    st.markdown(
+        "<h3 style='text-align: center; margin-bottom: 20px;'>Eco-Forest Valuation</h3>",
+        unsafe_allow_html=True
+    )
+
+ # Menu Navigasi Vertikal Bulat-Bulat (Pastikan jumlah ikon ada 5 buah)
     selected = option_menu(
         menu_title="Navigasi",
-        options=["Beranda", "Profil Hutan", "Produksi Makro", "Rencana Aksi & Investasi"],
-        icons=["house", "tree", "currency-dollar", "graph-up-arrow"],
+        options=["Beranda", "TEV & Trade-off", "Profil Hutan", "Produksi Makro", "Rencana Aksi & Investasi"],
+        icons=["house", "book", "tree", "currency-dollar", "graph-up-arrow"], # <-- Tambah "book" di sini agar pas 5 ikon
         menu_icon="cast",
         default_index=0,
         styles={
             "container": {"padding": "5px!", "background-color": "transparent"},
-            "icon": {"color": "#E53935", "font-size": "16px"}, # Warna merah bulat ikon acuan
+            "icon": {"color": "#E53935", "font-size": "16px"},
             "nav-link": {"font-size": "14px", "text-align": "left", "margin": "0px", "--hover-color": "#333333"},
             "nav-link-selected": {"background-color": "#212121"},
         }
     )
     
+
     st.write("---")
     st.header("⚙️ Parameter Simulasi")
+
     price_wood = st.slider("Harga Kayu (Rp/m³)", 1000000, 2500000, 1618000, step=50000)
     price_jelutung = st.slider("Harga Jelutung (Rp/kg)", 50000, 150000, 90000, step=5000)
     price_karet = st.slider("Harga Karet (Rp/kg)", 10000, 40000, 20000, step=1000)
 
+    st.write("---")
+    st.subheader("🌳 Simulasi TEV & Trade-Off")
 
+    carbon_value_ha = st.slider(
+        "Nilai Karbon (Rp/Ha/Tahun)",
+        500000, 5000000, 2000000, step=100000
+    )
+
+    water_service_ha = st.slider(
+        "Nilai Jasa Tata Air (Rp/Ha/Tahun)",
+        100000, 2000000, 1000000, step=50000
+    )
+
+    biodiversity_value_ha = st.slider(
+        "Nilai Biodiversitas (Rp/Ha/Tahun)",
+        100000, 3000000, 1500000, step=50000
+    )
+
+    production_intensity = st.slider(
+        "Intensitas Produksi (%)",
+        0, 100, 100, step=5
+    )
+    
 # ==========================================
 # 4. OPERASI HITUNG DATA
 # ==========================================
@@ -158,40 +186,6 @@ if selected == "Beranda":
     seperti kayu, getah jelutung, dan karet, sekaligus memetakan rencana aksi restorasi vegetasi 
     serta uji kelayakan finansial proyek mikro secara terintegrasi dan berkelanjutan.
     """)
-
-    st.write("---")
-
-    # 3. KERANGKA TEORI ACUAN (TEV & TRADE-OFF)
-    st.header("💡 Kerangka Teori: TEV & Trade-off Ekonomi-Ekologi")
-    
-    col_tev, col_trade = st.columns(2)
-    
-    with col_tev:
-        st.subheader("1. Total Economic Value (TEV)")
-        st.markdown("""
-        **Total Economic Value (TEV)** atau Nilai Ekonomi Total merupakan instrumen akademis komprehensif 
-        yang digunakan untuk mengidentifikasi dan menguantifikasi seluruh spektrum manfaat ekonomi 
-        ekosistem hutan, baik manfaat yang ter-capture oleh pasar maupun fungsi ekologis non-pasar.
-        
-        Dalam konteks analisis KPHP Lalan Mangsang Mendis, TEV diklasifikasikan menjadi:
-        * **Direct Use Value (Nilai Manfaat Langsung):** Nilai komoditas fisik yang dipanen langsung dari tapak hutan. Pada model makro ini direpresentasikan oleh volume produksi komoditas Kayu, Getah Jelutung, dan Karet.
-        * **Indirect Use Value (Nilai Manfaat Tidak Langsung):** Nilai dari berjalannya fungsi pendukung ekosistem (*ecosystem services*), seperti kemampuan rawa gambut dalam retensi tata air, pencegah kebakaran hidrologis, serta *carbon sink*.
-        * **Option & Non-Use Value (Nilai Pilihan & Eksistensi):** Nilai dari opsi perlindungan keanekaragaman hayati masa depan serta kepuasan moral atas kelestarian habitat hutan rawa agar dapat diwariskan lintas generasi.
-        """)
-        
-    with col_trade:
-        st.subheader("2. Analisis Trade-off (Pilihan Dilematis)")
-        st.markdown("""
-        ***Trade-off* (Pertukaran Pilihan)** mendefinisikan situasi struktural di mana pemenuhan satu tujuan optimal 
-        berdampak langsung pada penurunan performa parameter lainnya akibat kelangkaan dan keterbatasan alokasi sumber daya.
-        
-        Skenario pemodelan simulasi pada dashboard ini menjembatani benturan kepentingan fungsional antara:
-        * **Ekstraksi Finansial (Sektor Produksi):** Optimalisasi pemanfaatan zonasi blok produksi kayu makro untuk memacu pertumbuhan ekonomi daerah dan kapasitas fiskal unit pengelola tapak, namun membawa konsekuensi biaya pemulihan ekosistem yang tinggi.
-        * **Preservasi Ekologis (Sektor Restorasi):** Fokus intervensi penuh pada program rehabilitasi vegetasi tanaman lokal (seperti Jelutung dan Kenaf) guna mengembalikan fungsi lingkungan, namun membawa batasan regulasi terhadap laju pemanfaatan ekonomi jangka pendek masyarakat.
-        """)
-        
-    # Catatan Kesimpulan Teoretis Interaktif
-    st.info("📌 Kesimpulan Dashboard: Melalui integrasi parameter simulasi dinamis di bilah navigasi kiri, model visualisasi ini dirancang untuk merumuskan titik ekuilibrium (keseimbangan) optimal, meminimalkan dampak negatif trade-off, dan memaksimalkan capaian akumulasi nilai ekonomi total (TEV) hutan berkelanjutan.")
 
 # --- HALAMAN 2: PROFIL HUTAN ---
 elif selected == "Profil Hutan":
