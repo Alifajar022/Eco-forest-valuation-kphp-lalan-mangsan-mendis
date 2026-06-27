@@ -92,41 +92,21 @@ with st.sidebar:
     price_jelutung = st.slider("Harga Jelutung (Rp/kg)", 50000, 150000, 90000, step=5000)
     price_karet = st.slider("Harga Karet (Rp/kg)", 10000, 40000, 20000, step=1000)
 
-    st.write("---")
-    st.subheader("🌳 Parameter Ekologi (TEV)")
-    carbon_value_ha = st.slider("Nilai Karbon (Rp/Ha/Thn)", 500000, 5000000, 2000000, step=100000)
-    water_service_ha = st.slider("Nilai Tata Air (Rp/Ha/Thn)", 100000, 2000000, 1000000, step=50000)
-    biodiversity_value_ha = st.slider("Nilai Biodiversitas (Rp/Ha/Thn)", 100000, 3000000, 1500000, step=50000)
-    production_intensity = st.slider("Intensitas Eksploitasi (%)", 0, 100, 100, step=5)
-
 
 # ==========================================
-# 4. OPERASI HITUNG DATA (INTEGRASI TEV & TRADE-OFF)
+# 4. OPERASI HITUNG DATA BASE
 # ==========================================
-# Hitung Sektor Ekonomi Produksi Tradisional
-wood_income = wood_production["annual_volume_m3"] * price_wood * (production_intensity / 100)
+wood_income = wood_production["annual_volume_m3"] * price_wood
 jelutung_income = hhbk_production["jelutung_kg"] * price_jelutung
 karet_income = hhbk_production["karet_kg"] * price_karet
-total_ekonomi_langsung = wood_income + jelutung_income + karet_income
-
-# Hitung Sektor Ekologi Lingkungan (Terpengaruh oleh Intensitas Eksploitasi/Trade-off)
-# Jika Intensitas Eksploitasi Kayu 100%, Fungsi Ekologis menurun hingga sisa 30%
-ekologi_multiplier = 1.0 - (0.7 * (production_intensity / 100))
-total_luas = forest_profile["forest_area_ha"]
-
-carbon_total = (total_luas * carbon_value_ha) * ekologi_multiplier
-water_total = (total_luas * water_service_ha) * ekologi_multiplier
-biodiversity_total = (total_luas * biodiversity_value_ha) * ekologi_multiplier
-total_ekologi_tidak_langsung = carbon_total + water_total + biodiversity_total
-
-total_income_miliar = total_ekonomi_langsung / 1_000_000_000
+total_income_miliar = (wood_income + jelutung_income + karet_income) / 1_000_000_000
 
 df_makro = pd.DataFrame({
-    "Komoditas": ["Kayu (Sesuai Intensitas)", "Jelutung", "Karet"],
-    "Volume Produksi Base": [wood_production["annual_volume_m3"], hhbk_production["jelutung_kg"], hhbk_production["karet_kg"]],
+    "Komoditas": ["Kayu", "Jelutung", "Karet"],
+    "Volume Produksi": [wood_production["annual_volume_m3"], hhbk_production["jelutung_kg"], hhbk_production["karet_kg"]],
     "Satuan": ["m³", "Kg", "Kg"],
     "Harga Simulasi": [price_wood, price_jelutung, price_karet],
-    "Total Pendapatan (Rp)": [wood_income, jelutung_income, karet_income]
+    "Total Pendapatan": [wood_income, jelutung_income, karet_income]
 })
 
 
@@ -150,7 +130,6 @@ if selected == "Beranda":
         st.write("Yuhka Sundaya, S.E., M.Si.")
     
     st.write("")
-   # Kotak Kelompok Hijau Gelap Identitas (Sudah diurutkan ke bawah)
     st.markdown("""
     <div style="background-color: #112E14; padding: 18px; border-radius: 8px; color: #81C784; border-left: 6px solid #2E7D32;">
         <b style="color: #FFFFFF; font-size: 16px;">KELOMPOK 1</b><br>
@@ -170,45 +149,67 @@ if selected == "Beranda":
     maupun sebagai penggerak roda ekonomi daerah melalui pemanfaatan hasil hutan.
     
     Namun, sebagian kawasan ini menghadapi tantangan degradasi lahan akibat 
-    perubahan fungsi guna tanah dan kebakaran hutan. Oleh karena itu, diperlukan suatu pendekatan 
+    perubahan fungsi guna tanah dan kebakaran hutan. Maka dari itu, diperlukan suatu pendekatan 
     **Penilaian Ekonomi Sumber Daya Hutan (Eco-Forest Valuation)** untuk menghitung potensi nyata kawasan. 
     Melalui instrumen dashboard ini, saya mensimulasikan nilai ekonomi makro dari komoditas unggulan 
     seperti kayu, getah jelutung, dan karet, sekaligus memetakan rencana aksi restorasi vegetasi 
     serta uji kelayakan finansial proyek mikro secara terintegrasi dan berkelanjutan.
     """)
 
-# --- HALAMAN NEW SUB MENU: TEV & TRADE-OFF INTERAKTIF ---
+# --- HALAMAN 2: TEV & TRADE-OFF (PERSIS SEPERTI CONTOH FOTO) ---
 elif selected == "TEV & Trade-off":
-    st.title("💡 Analisis Komparatif TEV & Efek Trade-off")
+    st.title("Simulasi Perubahan TEV")
     st.write("---")
     
-    # Live Analisis Grafik Batang Perbandingan Trade-off Ekonomi vs Ekologi
-    st.subheader("📊 Grafik Efek Trade-off Real-Time")
-    df_chart = pd.DataFrame({
-        "Sektor Nilai (TEV)": ["Manfaat Pasar (Ekonomi Langsung)", "Manfaat Non-Pasar (Ekologi Jasa Lingkungan)"],
-        "Nilai Valuasi (Miliar Rp)": [total_ekonomi_langsung/1_000_000_000, total_ekologi_tidak_langsung/1_000_000_000]
-    })
-    fig_trade = px.bar(df_chart, x="Sektor Nilai (TEV)", y="Nilai Valuasi (Miliar Rp)", color="Sektor Nilai (TEV)",
-                       color_discrete_sequence=["#E53935", "#2E7D32"], text_auto='.2f')
-    st.plotly_chart(fig_trade, use_container_width=True)
+    # 1. SLIDER KERUSAKAN HUTAN (Sesuai Layout Foto)
+    kerusakan = st.slider("Kerusakan Hutan (Luas/Ha)", min_value=0, max_value=100, value=10, step=5, format="%d%%")
     
-    st.write("---")
+    # 2. PERHITUNGAN LOGIKA DATA (Trade-off)
+    # Nilai Ekosistem Tidak Langsung KPHP Lalan (Carbon + Air + Keberadaan) = Rp 480 Miliar dalam kondisi 0% rusak
+    nilai_ekologi_base = 480.0 
+    nilai_ekonomi_base = total_income_miliar # Dinamis mengikuti slider harga kayu/karet
     
-    # Penjelasan Teoretis Pendukung Akurasi Akademis
-    col_tev, col_trade = st.columns(2)
-    with col_tev:
-        st.subheader("1. Komponen Total Economic Value (TEV)")
+    tev_baru = nilai_ekonomi_base + nilai_ekologi_base
+    
+    # Efek Kerusakan: Mengurangi nilai ekologi secara drastis
+    kehilangan_ekologi = nilai_ekologi_base * (kerusakan / 100)
+    tev_setelah_degradasi = tev_baru - kehilangan_ekologi
+    persen_penurunan = ((tev_setelah_degradasi - tev_baru) / tev_baru) * 100
+
+    # 3. DISPLAY METRICS (Persis Seperti Gaya di Foto)
+    st.write("### Kerusakan")
+    st.header(f"{kerusakan}%")
+    
+    st.write("### TEV Baru")
+    st.header(f"Rp {tev_baru:.1f} Miliar")
+    
+    st.write("### TEV Setelah Degradasi")
+    st.header(f"Rp {tev_setelah_degradasi:.1f} Miliar")
+    
+    # Badges Indikator Penurunan Merah Merona
+    if persen_penurunan < 0:
         st.markdown(f"""
-        * **Direct Use Value (Nilai Guna Langsung):** Diperoleh dari ekstraksi fisik komoditas pasar saat ini. Berdasarkan parameter geser Anda, akumulasinya mencapai **Rp {total_ekonomi_langsung/1_000_000_000:,.2f} Miliar**.
-        * **Indirect Use Value (Nilai Guna Tidak Langsung):** Berasal dari fungsi regulasi iklim, hidrologi gambut, dan keanekaragaman hayati yang nilainya mencapai **Rp {total_ekologi_tidak_langsung/1_000_000_000:,.2f} Miliar**.
-        """)
-    with col_trade:
-        st.subheader("2. Implikasi Kebijakan Trade-off")
+        <span style="background-color: #FFEBEE; color: #C62828; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 14px;">
+            ↓ {persen_penurunan:.1f}%
+        </span>
+        """, unsafe_allow_html=True)
+    else:
         st.markdown(f"""
-        Ketika **Intensitas Eksploitasi** dinaikkan mendekati 100%, keuntungan finansial kayu melonjak tajam dalam jangka pendek. 
-        Namun, *trade-off* ekologis yang harus dibayar adalah rusaknya kapasitas *carbon sink* dan runtuhnya ekosistem rawa gambut. 
-        Dashboard ini mendemonstrasikan bagaimana pembatasan kuota tebang mampu menyelamatkan nilai ekologi jasa lingkungan jangka panjang.
-        """)
+        <span style="background-color: #E8F5E9; color: #2E7D32; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 14px;">
+            0.0%
+        </span>
+        """, unsafe_allow_html=True)
+        
+    st.write("")
+    st.write("")
+
+    # 4. KOTAK KESIMPULAN DINAMIS (Hijau/Kuning/Merah sesuai tingkat kerusakan)
+    if kerusakan <= 15:
+        st.success("Kondisi hutan masih relatif baik.")
+    elif kerusakan <= 40:
+        st.warning("Kondisi hutan dalam status waspada. Degradasi mulai mengancam fungsi tata air gambut.")
+    else:
+        st.error("Kondisi hutan kritis! Gangguan ekologis tinggi, diperlukan restorasi vegetasi segera.")
 
 # --- HALAMAN 3: PROFIL HUTAN ---
 elif selected == "Profil Hutan":
@@ -235,7 +236,7 @@ elif selected == "Produksi Makro":
     st.title("💰 Analisis Produksi & Pendapatan Kawasan")
     st.write("---")
     
-    st.metric(label="Total Estimasi Pendapatan Makro (Sektor Pasar)", value=f"Rp {total_income_miliar:.2f} Miliar/Tahun")
+    st.metric(label="Total Estimasi Pendapatan Makro", value=f"Rp {total_income_miliar:.2f} Miliar/Tahun")
     st.write("### Matriks Ekonomi Nilai Komoditas")
     st.dataframe(df_makro, use_container_width=True)
 
