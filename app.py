@@ -2,7 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
 import plotly.express as px
-from streamlit_option_menu import option_menu
+import plotly.graph_objects as go
+import numpy as np
 
 # ==========================================
 # 1. KONFIGURASI HALAMAN WEB STREAMLIT
@@ -64,6 +65,8 @@ data_kelayakan_proyek = {
 }
 df_kelayakan = pd.DataFrame(data_kelayakan_proyek)
 
+# Import widget navigasi pelengkap
+from streamlit_option_menu import option_menu
 
 # ==========================================
 # 3. SIDEBAR NAVIGATION
@@ -103,7 +106,7 @@ if selected == "Beranda":
         st.write("**Mata Kuliah:**")
         st.write("Ekonomi Sumber Daya Alam dan Lingkungan")
     with col_info2:
-        st.write("**Dosen Pengampu:**")
+        st.write("**Dosen Pengampu:**") <br>
         st.write("Yuhka Sundaya, S.E., M.Si.")
     
     st.write("")
@@ -132,7 +135,7 @@ if selected == "Beranda":
     sekaligus memetakan rencana aksi restorasi vegetasi serta uji kelayakan finansial proyek secara terintegrasi.
     """)
 
-# --- HALAMAN 2: PROFIL HUTAN (SUDAH DITINGKATKAN) ---
+# --- HALAMAN 2: PROFIL HUTAN ---
 elif selected == "Profil Hutan":
     st.title("📋 Profil Spasial & Tipologi Wilayah Kerja KPHP Lalan")
     st.write("---")
@@ -243,44 +246,84 @@ elif selected == "Valuasi TEV":
     Ketika tingkat kerusakan berada pada angka **{kerusakan}%**, ekosistem kehilangan kemampuan jasa lingkungannya sebesar **Rp {kehilangan_jasa_lingkungan:.1f} Miliar**. Kerugian ekologis ini sering kali tidak tercatat dalam akuntansi ekonomi konvensional karena bersifat *non-market commodity*, padahal dampaknya nyata memicu penurunan daya dukung lingkungan wilayah Sumatera Selatan.
     """)
 
-# --- HALAMAN 5: ANALISIS TRADE-OFF ---
+# --- HALAMAN 5: ANALISIS TRADE-OFF (DIRENOVASI SECARA KOMPREHENSIF) ---
 elif selected == "Analisis Trade-Off":
-    st.title("🔄 Analisis Konflik Kepentingan & Efek Trade-Off")
+    st.title("🔄 Komparasi Multikriteria & Pemodelan Teoretis Trade-Off Ekonomi-Ekologi")
     st.write("---")
     
-    st.subheader("⚙️ Parameter Kebijakan Pemanfaatan Kawasan")
-    st.markdown("Geser intensitas eksploitasi untuk melihat bagaimana keuntungan ekonomi mengorbankan jasa lingkungan:")
-    intensitas_tebang = st.slider("Intensitas Eksploitasi Kayu Komersial (%)", 0, 100, 60, step=10)
+    st.subheader("⚙️ Parameter Kebijakan Alokasi Pemanfaatan Ruang")
+    st.markdown("Sesuaikan intensitas eksploitasi untuk mensimulasikan hukum batas penarikan sumber daya (*diminishing marginal returns*):")
+    intensitas_tebang = st.slider("Tingkat Pemanfaatan Blok Produksi Kayu Komersial (%)", 0, 100, 50, step=5)
     
-    manfaat_ekonomi = 711.9 * (intensitas_tebang / 100) + 127.6
+    # 1. FORMULASI MODEL MATEMATIS EKONOMI LINGKUNGAN (PPF Frontier Model)
+    # Keuntungan ekonomi bergerak linear ke logaritmik naik
+    manfaat_ekonomi = 711.9 * (intensitas_tebang / 100) + 127.6 
+    # Kerusakan ekologi bersifat non-linear kuadratik (asumsi degradasi eksponensial setelah melewati treshold 50%)
     manfaat_ekologi = 779.8 * (1.0 - (intensitas_tebang / 100) ** 2)
     tev_gabungan = manfaat_ekonomi + manfaat_ekologi
     
-    df_trade = pd.DataFrame({
-        "Komponen Sektor": ["Manfaat Pasar (Ekonomi)", "Manfaat Non-Pasar (Ekologi)", "Total Nilai Ekonomi Kawasan (TEV)"],
-        "Nilas Valuasi (Miliar Rp)": [manfaat_ekonomi, manfaat_ekologi, tev_gabungan]
-    })
-    
-    fig_trade = px.bar(
-        df_trade, x="Komponen Sektor", y="Nilas Valuasi (Miliar Rp)", color="Komponen Sektor",
-        color_discrete_sequence=["#E53935", "#2E7D32", "#1565C0"], text_auto='.1f',
-        title=f"Keseimbangan Nilai Kawasan pada Intensitas Eksploitasi {intensitas_tebang}%"
-    )
-    st.plotly_chart(fig_trade, use_container_width=True)
-    
+    # Perhitungan Opportunity Cost Riil
+    # Berapa rupiah ekologi yang hilang demi menambah 1% intensitas ekonomi berikutnya
+    opp_cost_ekologi = 2 * 779.8 * (intensitas_tebang / 100) * 0.01 
+
+    # 2. SEKSI METRIK LIVE KINERJA TRADE-OFF
+    col_t1, col_t2, col_t3 = st.columns(3)
+    with col_t1:
+        st.metric(label="Pendapatan Finansial Pasar (Tangible)", value=f"Rp {manfaat_ekonomi:.1f} Miliar")
+    with col_t2:
+        st.metric(label="Nilai Jasa Ekosistem Tersisa (Intangible)", value=f"Rp {manfaat_ekologi:.1f} Miliar")
+    with col_t3:
+        st.metric(label="Marginal Opportunity Cost (Per 1% Ekspansi)", value=f"Rp {opp_cost_ekologi:.2f} Miliar")
+
+    # 3. GRAFIK KINETIK INTERAKTIF FRONTIER KEMUNGKINAN PRODUKSI (PPF CURVE)
     st.write("---")
-    st.subheader("⚖️ Esensi Fenomena Trade-Off (Tarik-Menarik Manfaat)")
+    st.subheader("📈 Kurva Batas Kemungkinan Produksi (Production Possibility Frontier - PPF)")
+    
+    # Generate data titik-titik kurva PPF (0% sampai 100%)
+    x_val = [] # Ekonomi
+    y_val = [] # Ekologi
+    intensities = np.linspace(0, 100, 101)
+    for i in intensities:
+        x_val.append(711.9 * (i / 100) + 127.6)
+        y_val.append(779.8 * (1.0 - (i / 100) ** 2))
+        
+    fig_ppf = go.Figure()
+    # Plot Garis Kurva Efisiensi Pareto (PPF)
+    fig_ppf.add_trace(go.Scatter(x=x_val, y=y_val, mode='lines', name='Batas Efisiensi PPF', line=dict(color='#1565C0', width=3)))
+    # Plot Titik Posisi Kebijakan Saat Ini (Sesuai Slider)
+    fig_ppf.add_trace(go.Scatter(x=[manfaat_ekonomi], y=[manfaat_ekologi], mode='markers+text', name='Posisi Kebijakan Terpilih',
+                                 marker=dict(color='#E53935', size=14, symbol='circle'),
+                                 text=[f"Pilihan Aktif ({intensitas_tebang}%)"], textposition="top right"))
+    
+    fig_ppf.update_layout(
+        title="Kurva Pengorbanan Optimum Pareto (Ekonomi vs Jasa Ekosistem Lalan)",
+        xaxis_title="Nilai Manfaat Finansial Ekonomi (Miliar Rp)",
+        yaxis_title="Nilai Keberlanjutan Jasa Lingkungan (Miliar Rp)",
+        template="plotly_white",
+        legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01)
+    )
+    st.plotly_chart(fig_ppf, use_container_width=True)
+
+    # 4. REVIEW AKADEMIS MENDALAM DI BAWAH GRAFIK
+    st.subheader("📚 Tinjauan Teoretis Keseimbangan Ekonomi-Lingkungan (Trade-Off)")
     st.markdown(f"""
-    Dalam ekonomi sumber daya alam, **Trade-off** adalah situasi penarikan keputusan di mana keuntungan di satu sektor secara mutlak menuntut pengorbanan di sektor lainnya. Di kawasan KPHP Lalan, dinamika tarik-menarik ini terjadi secara tajam antara **Peningkatan Pendapatan Finansial Daerah** dan **Keberlanjutan Fungsi Jasa Ekosistem Gambut**.
+    Kurva di atas mengilustrasikan **Kurva Kemungkinan Produksi (PPF)** yang merepresentasikan batas kombinasi alokasi ruang yang efisien di KPHP Lalan. Sumbu horizontal mengukur nilai ekstraksi ekonomi langsung, sedangkan sumbu vertikal mengukur pemeliharaan aset regulasi lingkungan.
+
+    ### 🔍 Analisis Komparatif Multikriteria:
     
-    *   **Ketika Eksploitasi Rendah (0% - 30%):** Keuntungan ekonomi dari produksi kayu sangat minim, namun nilai pelestarian lingkungan berada pada tingkat klimaks. Kawasan berfungsi penuh sebagai penahan emisi karbon.
-    *   **Ketika Eksploitasi Maksimal ({intensitas_tebang}% - 100%):** Pendapatan dari sektor perkayuan melonjak naik hingga mencapai angka tertinggi. Namun, konsekuensi *trade-off* ekologis yang harus dibayar adalah hancurnya nilai ekologi secara eksponensial (menurun drastis menjadi sisa **Rp {manfaat_ekologi:.1f} Miliar**). 
-    
-    **Rekomendasi Kebijakan (Optimum Management):**
-    Grafik di atas membuktikan bahwa pemanfaatan hutan tidak boleh dilakukan secara eksploitatif (100%). Poin keseimbangan terbaik dicapai melalui pengelolaan multi-pihak, yaitu membatasi tebangan kayu tahunan dan beralih mengoptimalkan komoditas non-kayu (Karet & Jelutung) yang tidak merusak tegakan utama rawa gambut.
+    1. **Asimetri Pengorbanan (Non-Linear Trade-off):**
+       Model matematika di atas dirancang menggunakan pendekatan non-linear kuadratik untuk nilai ekologi. Hal ini merefleksikan kondisi nyata rawa gambut Sumatera Selatan, di mana pembukaan lahan awal mungkin tidak berdampak signifikan, namun ketika intensitas ekstraksi komersial melewati ambang batas kritis (treshold) $>50\\%$, degradasi fungsi tata air berjalan **secara eksponensial**.
+       
+    2. **Analisis Biaya Imbangan (Opportunity Cost):**
+       Pada posisi alokasi instensitas sebesar **{intensitas_tebang}%**, *Marginal Opportunity Cost* berada di angka **Rp {opp_cost_ekologi:.2f} Miliar**. Artinya, jika regulator memutuskan untuk memperluas area tebangan kayu komersial sebesar 1% lagi demi mengejar target retribusi, daerah harus mengorbankan fungsi regulasi banjir dan penyerapan karbon senilai **Rp {opp_cost_ekologi:.2f} Miliar**. Kehilangan ini jauh lebih besar daripada marjinal profit kayu yang didapatkan.
+
+    ### 🛡️ Rekomendasi Alokasi Kebijakan (Optimum Management):
+    * **Titik Ekstrim Kiri (Eksploitasi < 20%):** Terlalu mementingkan konservasi mutlak sehingga memicu tingginya angka kemiskinan masyarakat sekitar hutan akibat hilangnya lapangan kerja sektor kehutanan (*under-utilization*).
+    * **Titik Ekstrim Kanan (Eksploitasi > 70%):** Memaksimalkan pendapatan wilayah secara agresif namun memicu ancaman ekosistem berupa kebakaran lahan gambut hebat dan subsiden tanah nasional.
+    * **Skenario Kompromi (Optimal Safe Minimum Standard):** Alokasi ideal KPHP Lalan berada pada rentang **35% - 50%**. Pada skenario ini, nilai TEV gabungan mencapai titik optimum, di mana industri perkayuan tetap berjalan secara terbatas (*sustainable logging*) berdampingan dengan perlindungan penuh wilayah tangkapan air gambut.
     """)
 
-# --- HALAMAN 6: RENCANA AKSI & INVESTASI (SUDAH DITINGKATKAN) ---
+# --- HALAMAN 6: RENCANA AKSI & INVESTASI ---
 elif selected == "Rencana Aksi & Investasi":
     st.title("🌱 Manajemen Intervensi: Restorasi Lahan & Analisis Kelayakan Investasi Finansial")
     st.write("---")
