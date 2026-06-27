@@ -150,11 +150,14 @@ if selected == "Beranda":
         st.write("Yuhka Sundaya, S.E., M.Si.")
     
     st.write("")
+   # Kotak Kelompok Hijau Gelap Identitas (Sudah diurutkan ke bawah)
     st.markdown("""
     <div style="background-color: #112E14; padding: 18px; border-radius: 8px; color: #81C784; border-left: 6px solid #2E7D32;">
         <b style="color: #FFFFFF; font-size: 16px;">KELOMPOK 1</b><br>
-        <span style="color: #FFFFFF;">• Ali Fajar Maulana (10090222056) 
-                azrial rafsanzanni (10090222067)</span>
+        <span style="color: #FFFFFF;">
+            • Ali Fajar Maulana (10090222056)<br>
+            • Azrial Rafsanzanni (10090222067)
+        </span>
     </div>
     """, unsafe_allow_html=True)
 
