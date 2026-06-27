@@ -66,7 +66,7 @@ df_kelayakan = pd.DataFrame(data_kelayakan_proyek)
 
 
 # ==========================================
-# 3. SIDEBAR NAVIGATION (6 SUB-BAB)
+# 3. SIDEBAR NAVIGATION
 # ==========================================
 with st.sidebar:
     st.image("logo unisba.jpg", use_container_width=True)
@@ -132,32 +132,41 @@ if selected == "Beranda":
     sekaligus memetakan rencana aksi restorasi vegetasi serta uji kelayakan finansial proyek secara terintegrasi.
     """)
 
-# --- HALAMAN 2: PROFIL HUTAN ---
+# --- HALAMAN 2: PROFIL HUTAN (SUDAH DITINGKATKAN) ---
 elif selected == "Profil Hutan":
-    st.title("📋 Profil Wilayah Kerja KPHP Lalan")
+    st.title("📋 Profil Spasial & Tipologi Wilayah Kerja KPHP Lalan")
     st.write("---")
     
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([4, 3])
     with col1:
+        st.subheader("📌 Alokasi Tata Ruang Kawasan")
         st.markdown(f"""
-        ### Pembagian Alokasi Ruang Kawasan:
-        * **Total Luas Kawasan:** {forest_profile['forest_area_ha']:,} Ha
-        * **Blok Produksi:** {forest_profile['production_forest_block_ha']:,} Ha
-        * **Blok HHBK:** {forest_profile['hhbk_block_ha']:,} Ha
-        * **Blok Pemberdayaan Masy.:** {forest_profile['community_block_ha']:,} Ha
+        Secara administratif dan fungsional, KPHP Lalan Mangsang Mendis dibagi menjadi beberapa blok pengelolaan utama untuk menjamin kepastian hukum dan efektivitas manajemen hutan produksi berkelanjutan:
+        
+        *   **Total Luas Wilayah Kerja:** {forest_profile['forest_area_ha']:,} Ha
+        *   **Blok Pemanfaatan Intensif (Produksi):** {forest_profile['production_forest_block_ha']:,} Ha — Difokuskan untuk pemanfaatan hasil hutan kayu komersial melalui sistem silvikultur yang legal.
+        *   **Blok Hasil Hutan Bukan Kayu (HHBK):** {forest_profile['hhbk_block_ha']:,} Ha — Zona perlindungan sekaligus pemanfaatan terbatas komoditas getah-getahan dan komoditas lokal non-kayu.
+        *   **Blok Pemberdayaan Masyarakat (Komunitas):** {forest_profile['community_block_ha']:,} Ha — Area yang diarahkan untuk skema Perhutanan Sosial guna memitigasi konflik tenurial.
         """.replace(",", "."))
     with col2:
+        st.subheader("📊 Proporsi Tata Guna Lahan")
         sizes_lahan = [forest_profile["production_forest_block_ha"], forest_profile["hhbk_block_ha"], forest_profile["community_block_ha"]]
         fig2, ax2 = plt.subplots(figsize=(5, 4))
-        ax2.pie(sizes_lahan, labels=["Produksi", "HHBK", "Komunitas"], autopct="%1.1f%%", startangle=140, colors=["#2E7D32", "#81C784", "#C8E6C9"])
+        ax2.pie(sizes_lahan, labels=["Produksi", "HHBK", "Komunitas"], autopct="%1.1f%%", startangle=140, colors=["#1b5e20", "#4caf50", "#a5d6a7"])
+        fig2.patch.set_facecolor('none')
         st.pyplot(fig2)
+
+    st.write("---")
+    st.subheader("🔍 Tinjauan Karakteristik Ekologis")
+    st.markdown("""
+    Kawasan KPHP Lalan didominasi oleh tipologi ekosistem **Hutan Rawa Gambut dan Dataran Rendah Sumatera**. Karakteristik tanah gambut (*Histosols*) yang mendominasi sebagian wilayah kerja memberikan nilai kerentanan ekologis yang tinggi. Berdasarkan sudut pandang ekonomi lingkungan, kawasan ini memiliki fungsi hidrologis berupa penyimpanan air skala makro serta pencegah amblesan tanah (*subsidence*). Oleh karena itu, ketepatan delokasi blok produksi menjadi kunci utama agar tidak merusak ekosistem kubah gambut (*peat dome*) yang menjadi penyimpan cadangan karbon terbesar.
+    """)
 
 # --- HALAMAN 3: ANALISIS TEGAKAN ---
 elif selected == "Analisis Tegakan":
     st.title("📊 Analisis Potensi Tegakan & Hasil Hutan Makro")
     st.write("---")
     
-    # Masukkan slider khusus parameter ekonomi di sini
     st.subheader("⚙️ Parameter Harga Pasar")
     price_wood = st.slider("Harga Kayu (Rp/m³)", 1000000, 2500000, 1618000, step=50000)
     price_jelutung = st.slider("Harga Jelutung (Rp/kg)", 50000, 150000, 90000, step=5000)
@@ -190,7 +199,6 @@ elif selected == "Valuasi TEV":
     st.title("🧮 Valuasi Nilai Ekonomi Total (Total Economic Value - TEV)")
     st.write("---")
     
-    # Parameter Khusus TEV
     col_p1, col_p2 = st.columns(2)
     with col_p1:
         st.subheader("⚙️ Parameter Ekologi Base")
@@ -200,8 +208,7 @@ elif selected == "Valuasi TEV":
         st.subheader("⚙️ Simulasi Kerusakan Ekosistem")
         kerusakan = st.slider("Tingkat Kerusakan Hutan (Luas/Ha)", min_value=0, max_value=100, value=10, step=5, format="%d%%")
         
-    # Hitung Komponen TEV
-    nilai_ekonomi_tetap = 711.9 + 62.8 + 64.8 # Nilai Ekonomi Pasar Konstan (Miliar)
+    nilai_ekonomi_tetap = 711.9 + 62.8 + 64.8
     nilai_ekologi_base = ((forest_profile["forest_area_ha"] * carbon_value_ha) + (forest_profile["forest_area_ha"] * water_service_ha)) / 1_000_000_000
     
     tev_awal = nilai_ekonomi_tetap + nilai_ekologi_base
@@ -209,7 +216,6 @@ elif selected == "Valuasi TEV":
     tev_setelah_degradasi = tev_awal - kehilangan_jasa_lingkungan
     persen_penurunan = ((tev_setelah_degradasi - tev_awal) / tev_awal) * 100
 
-    # Tampilan Metrik Seperti di Foto
     st.write("---")
     col_m1, col_m2, col_m3 = st.columns(3)
     with col_m1:
@@ -226,7 +232,6 @@ elif selected == "Valuasi TEV":
     else:
         st.error("Status Kritis! Ekosistem rawa gambut mengalami degradasi parah, membutuhkan tindakan darurat.")
 
-    # PENJELASAN AKADEMIK DI BAWAH SIMULASI
     st.write("---")
     st.subheader("🔍 Penjelasan Teoretis Valuasi Ekonomi")
     st.markdown(f"""
@@ -247,12 +252,10 @@ elif selected == "Analisis Trade-Off":
     st.markdown("Geser intensitas eksploitasi untuk melihat bagaimana keuntungan ekonomi mengorbankan jasa lingkungan:")
     intensitas_tebang = st.slider("Intensitas Eksploitasi Kayu Komersial (%)", 0, 100, 60, step=10)
     
-    # Model Matematika Konseptual Trade-off
-    manfaat_ekonomi = 711.9 * (intensitas_tebang / 100) + 127.6 # Kayu linear naik + HHBK stabil
-    manfaat_ekologi = 779.8 * (1.0 - (intensitas_tebang / 100) ** 2) # Penurunan ekologi non-linear (makin botak makin hancur ekologinya)
+    manfaat_ekonomi = 711.9 * (intensitas_tebang / 100) + 127.6
+    manfaat_ekologi = 779.8 * (1.0 - (intensitas_tebang / 100) ** 2)
     tev_gabungan = manfaat_ekonomi + manfaat_ekologi
     
-    # Visualisasi Grafik Batang Komparatif
     df_trade = pd.DataFrame({
         "Komponen Sektor": ["Manfaat Pasar (Ekonomi)", "Manfaat Non-Pasar (Ekologi)", "Total Nilai Ekonomi Kawasan (TEV)"],
         "Nilas Valuasi (Miliar Rp)": [manfaat_ekonomi, manfaat_ekologi, tev_gabungan]
@@ -265,7 +268,6 @@ elif selected == "Analisis Trade-Off":
     )
     st.plotly_chart(fig_trade, use_container_width=True)
     
-    # PENJELASAN MENDALAM TENTANG TARIK MENARIK (TRADE-OFF)
     st.write("---")
     st.subheader("⚖️ Esensi Fenomena Trade-Off (Tarik-Menarik Manfaat)")
     st.markdown(f"""
@@ -278,14 +280,42 @@ elif selected == "Analisis Trade-Off":
     Grafik di atas membuktikan bahwa pemanfaatan hutan tidak boleh dilakukan secara eksploitatif (100%). Poin keseimbangan terbaik dicapai melalui pengelolaan multi-pihak, yaitu membatasi tebangan kayu tahunan dan beralih mengoptimalkan komoditas non-kayu (Karet & Jelutung) yang tidak merusak tegakan utama rawa gambut.
     """)
 
-# --- HALAMAN 6: RENCANA AKSI & INVESTASI ---
+# --- HALAMAN 6: RENCANA AKSI & INVESTASI (SUDAH DITINGKATKAN) ---
 elif selected == "Rencana Aksi & Investasi":
-    st.title("🌱 Rencana Restorasi Lahan & Kelayakan Finansial Mikro")
+    st.title("🌱 Manajemen Intervensi: Restorasi Lahan & Analisis Kelayakan Investasi Finansial")
     st.write("---")
     
-    st.subheader("Strategi Aksi Pemulihan Vegetasi")
+    st.subheader("📋 1. Matriks Strategi Pemulihan Fungsi Ekologis Lahan")
+    st.markdown("""
+    Tabel di bawah memetakan rencana lokus wilayah intervensi restorasi vegetatif untuk mengembalikan jasa lingkungan (*environmental services*) yang hilang akibat degradasi:
+    """)
     st.dataframe(df_restorasi, use_container_width=True)
     
+    st.markdown("""
+    *   **Pola Pengayaan Spesies Lokal:** Pemilihan komoditas seperti Pohon Jelutung di Blok Jasa Lingkungan dirancang khusus untuk skema *paludikultur* (budidaya ramah lahan basah) tanpa melakukan pengeringan gambut (*drainage*).
+    *   **Agroforestri:** Integrasi Sengon dan Singkong bertujuan untuk menjaga kestabilan ekonomi masyarakat jangka pendek sekaligus memulihkan tutupan kanopi hutan jangka panjang.
+    """)
+    
     st.write("---")
-    st.subheader("Analisis Proyeksi Kelayakan Investasi Mikro")
+    st.subheader("💰 2. Analisis Penganggaran Modal Mikro (Capital Budgeting Analysis)")
+    st.markdown("""
+    Guna mengimplementasikan rencana aksi di atas, berikut adalah matriks penilaian kelayakan investasi jangka panjang menggunakan tiga parameter indikator akademis: **Net Present Value (NPV)**, **Internal Rate of Return (IRR)**, dan **Benefit-Cost Ratio (BCR)** dengan asumsi tingkat suku bunga diskonto (*discount rate*) sebesar 10%.
+    """)
     st.dataframe(df_kelayakan, use_container_width=True)
+    
+    st.write("")
+    st.markdown("""
+    ### 🔍 Teori & Interpretasi Hasil Kelayakan Investasi:
+    
+    1.  **Net Present Value (NPV):** 
+        Mengukur selisih antara nilai arus kas masuk saat ini dengan nilai arus kas keluar pada masa sekarang. Berdasarkan kaidah keputusan ekonomi, jika $\\text{NPV} > 0$, proyek dinyatakan layak dijalankan. Proyek **Getah Jelutung (100 Ha)** memimpin dengan nilai NPV tertinggi mencapai **> Rp 41 Miliar**, membuktikan potensi penyerapan pasar yang sangat signifikan dalam jangka panjang.
+        
+    2.  **Internal Rate of Return (IRR):** 
+        Merupakan tingkat pengembalian internal atau suku bunga maksimal yang dapat ditanggung oleh proyek. Seluruh komoditas yang disimulasikan memiliki nilai IRR di atas tingkat suku bunga acuan ($\> 10\\%$) dengan nilai tertinggi pada proyek **Minyak Nilam (19\\%)** dan **Persemaian Mandiri (20\\%)**. Hal ini mengindikasikan efisiensi penggunaan modal yang tinggi pada skala usaha mikro.
+        
+    3.  **Benefit-Cost Ratio (BCR):** 
+        Perbandingan nilai pendapatan dengan total biaya operasional. Syarat kelayakan mutlak adalah $\\text{BCR} > 1.0$. Semua opsi komoditas memenuhi syarat ini, di mana proyek **Getah Jelutung** mencatatkan efisiensi efisiensi tertinggi sebear **1.71**, artinya setiap Rp 1,00 modal investasi yang dialokasikan mampu menghasilkan nilai balik sebesar Rp 1,71.
+        
+    **Kesimpulan Strategis:**
+    Kombinasi antara intervensi ekologis melalui sistem *paludikultur Agroforestri* tidak hanya berhasil merehabilitasi nilai *Total Economic Value* (TEV) yang terdegradasi, melainkan juga secara empiris sangat layak dari segi finansial komersial untuk mendongkrak perekonomian masyarakat lokal di sekitar KPHP Lalan.
+    """)
