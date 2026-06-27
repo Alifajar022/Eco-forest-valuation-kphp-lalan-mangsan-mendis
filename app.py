@@ -106,7 +106,7 @@ if selected == "Beranda":
         st.write("**Mata Kuliah:**")
         st.write("Ekonomi Sumber Daya Alam dan Lingkungan")
     with col_info2:
-        st.write("**Dosen Pengampu:**") <br>
+        st.write("**Dosen Pengampu:**")
         st.write("Yuhka Sundaya, S.E., M.Si.")
     
     st.write("")
